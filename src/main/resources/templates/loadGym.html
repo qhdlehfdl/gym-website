@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="https://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" href="css/bootstrap.min.css">
+    <link rel="stylesheet" href="css/custom.css?after">
+<!--    ?after -> css파일 인식못할때-->
+    <script src="https://code.jquery.com/jquery-3.1.1.min.js"></script>
+    <script src="js/bootstrap.js"></script>
+    <title>상품 등록</title>
+    <style type="text/css">
+        html,
+        body {
+            height: 100%;
+        }
+
+        .form-signin {
+            max-width: 450px;
+            padding: 1rem;
+        }
+    </style>
+</head>
+
+<body>
+<div class="container" style="max-width: 650px;">
+    <main>
+        <div class="py-5 text-center">
+            <h2>업체 등록</h2>
+        </div>
+        <div class="row">
+            <div class="text-center">
+                <form method="post" action="/loadGymAction">
+
+                    <div class="row g-3 py-3">
+                        <div class="col-12">
+                            <label for="gymAddress" class="form-label">주소</label>
+                            <input class="form-control" id="gymAddress" name="gymAddress" required>
+                        </div>
+                    </div>
+
+                    <div class="row g-3 py-3">
+                        <div class="col-12">
+                            <label for="gymName" class="form-label">업체 이름</label>
+                            <input class="form-control" id="gymName" name="gymName" required>
+                        </div>
+                    </div>
+
+                    <div class="row g-3 py-3">
+                        <div class="col-12">
+                            <label for="dayPrice" class="form-label">일일권 가격</label>
+                            <input class="form-control" id="dayPrice" name="dayPrice" required>
+                        </div>
+                    </div>
+
+                    <hr class="my-4">
+
+                    <button class="w-100 btn btn-outline-secondary btn-lg" type="submit">업체 등록하기</button>
+                </form>
+            </div>
+        </div>
+    </main>
+</div>
+</body>
+
+</html>

@@ -1,0 +1,244 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="https://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" href="../css/bootstrap.min.css">
+    <link rel="stylesheet" href="../css/custom.css">
+    <script src="https://code.jquery.com/jquery-3.1.1.min.js"></script>
+    <script src="js/bootstrap.js"></script>
+    <script type="text/javascript" src="https://oapi.map.naver.com/openapi/v3/maps.js?ncpClientId=i427b56eke&submodules=geocoder"></script>
+    <script src="js/MarkerClustering.js"></script>
+    <title>헬스장 메인</title>
+</head>
+
+<body>
+    <div class="container">
+        <header class="border-bottom 1h-1 py-3">
+            <div class="row flex-nowrap justify-content-between align-items-center">
+                <div class="col-4 pt-1  align-content-center">
+                    <a class="blog-header-logo text-body-emphasis text-decoration-none" href="/main">헬스</a>
+                </div>
+                <div class="col-4 pt-1 text-center">
+                    <h3 class="text-body-emphasis" th:if="${session.loginCheck==null}" th:text="'환영합니다!'"></h3>
+                    <h3 class="text-body-emphasis" th:unless="${session.loginCheck==null}" th:text="${session.loginCheck+'님 환영합니다!'}"></h3>
+                </div>
+                <div class="col-4 d-flex justify-content-end align-items-center">
+                    <a class="btn btn-sm btn-outline-secondary" href="/login" th:if="${session.loginCheck==null}">장바구니</a>
+                    <a class="btn btn-sm btn-outline-secondary" href="/cart" th:unless="${session.loginCheck==null}">장바구니</a>
+                    <a class="btn btn-sm btn-outline-secondary" th:if="${session.loginCheck==null}" href="/login">로그인</a>
+                    <a class="btn btn-sm btn-outline-secondary" th:unless="${session.loginCheck==null}" href="/logout">로그아웃</a>
+                </div>
+            </div>
+        </header>
+
+        <div class="nav-scroller py-1 mb-3 border-bottom">
+            <nav class="nav nav-underline justify-content-between">
+                <a class="nav-item nav-link link-body-emphasis" href="/machineList">머신</a>
+                <a class="nav-item nav-link link-body-emphasis" href="/search">헬스장 찾기</a>
+            </nav>
+        </div>
+
+        <div class="text-center my-3">
+            <input id="address" type="text" placeholder="검색할 주소">
+            <input class="btn btn-outline-secondary" id="submit" type="button" value="검색">
+            <input class="btn btn-outline-secondary" type="button" onclick="gobackFirst();" value="현위치">
+        </div>
+
+
+        <div id="map" style="width:100%;height:400px;"></div>
+
+        <script th:inline="javascript">
+
+            var gymList = [[${list}]];
+
+            var map = new naver.maps.Map("map", {
+                center: new naver.maps.LatLng(37.3595316, 127.1052133),
+                zoom: 15,
+            });
+
+            var markers = [];
+            var infoWindows=[];
+
+            var firstLocation; //현위치 버튼
+
+            var htmlMarker1 = {
+                    content: '<div style="cursor:pointer;width:40px;height:40px;line-height:42px;font-size:10px;color:white;text-align:center;font-weight:bold;background:url(/images/cluster-marker-1.png);background-size:contain;"></div>',
+                    size: N.Size(40, 40),
+                    anchor: N.Point(20, 20)
+                },
+                htmlMarker2 = {
+                    content: '<div style="cursor:pointer;width:40px;height:40px;line-height:42px;font-size:10px;color:white;text-align:center;font-weight:bold;background:url(/images/cluster-marker-2.png);background-size:contain;"></div>',
+                    size: N.Size(40, 40),
+                    anchor: N.Point(20, 20)
+                },
+                htmlMarker3 = {
+                    content: '<div style="cursor:pointer;width:40px;height:40px;line-height:42px;font-size:10px;color:white;text-align:center;font-weight:bold;background:url(/images/cluster-marker-3.png);background-size:contain;"></div>',
+                    size: N.Size(40, 40),
+                    anchor: N.Point(20, 20)
+                },
+                htmlMarker4 = {
+                    content: '<div style="cursor:pointer;width:40px;height:40px;line-height:42px;font-size:10px;color:white;text-align:center;font-weight:bold;background:url(/images/cluster-marker-4.png);background-size:contain;"></div>',
+                    size: N.Size(40, 40),
+                    anchor: N.Point(20, 20)
+                },
+                htmlMarker5 = {
+                    content: '<div style="cursor:pointer;width:40px;height:40px;line-height:42px;font-size:10px;color:white;text-align:center;font-weight:bold;background:url(/images/cluster-marker-5.png);background-size:contain;"></div>',
+                    size: N.Size(40, 40),
+                    anchor: N.Point(20, 20)
+                };
+
+            $(function (){
+                initMap();
+            })
+
+            function gobackFirst(){
+                map.setCenter(firstLocation);
+            }
+
+            function initMap(){
+
+                //첫 시작 자기 위치 함수/////////
+                function onSuccessGeolocation(position) {
+                    var location = new naver.maps.LatLng(position.coords.latitude,
+                        position.coords.longitude);
+
+                    firstLocation=location;
+
+                    map.setCenter(location); // 얻은 좌표를 지도의 중심으로 설정합니다.
+
+                    console.log('Coordinates: ' + location.toString());
+                }
+
+                function onErrorGeolocation() {
+                    var center = map.getCenter();
+                }
+
+                //////////////////////////
+
+                //첫시작 자기 위치
+                if (navigator.geolocation) {
+                    /**
+                     * navigator.geolocation 은 Chrome 50 버젼 이후로 HTTP 환경에서 사용이 Deprecate 되어 HTTPS 환경에서만 사용 가능 합니다.
+                     * http://localhost 에서는 사용이 가능하며, 테스트 목적으로, Chrome 의 바로가기를 만들어서 아래와 같이 설정하면 접속은 가능합니다.
+                     * chrome.exe --unsafely-treat-insecure-origin-as-secure="http://example.com"
+                     */
+                    navigator.geolocation.getCurrentPosition(onSuccessGeolocation, onErrorGeolocation);
+                } else {
+                    var center = map.getCenter();
+                }
+
+                function searchAddressToCoordinate(address) {
+                    var ret = naver.maps.Service.geocode({
+                        query: address,
+                    }, function(status, response) {
+                        if (status === naver.maps.Service.Status.ERROR) {
+                            return alert('Something Wrong!');
+                        }
+
+                        if (response.v2.meta.totalCount === 0) {
+                            return alert('totalCount' + response.v2.meta.totalCount);
+                        }
+
+                        var item = response.v2.addresses[0];
+                        var point = new naver.maps.Point(item.x, item.y);
+
+                        map.setCenter(point);
+                     });
+                }
+
+                for (var i = 0; i < gymList.length; i++) {
+                    makeMark(gymList[i].gymAddress,gymList[i].gymName,gymList[i].dayPrice,gymList[i].gymID,i);
+                }
+
+                function getClickHandler(){
+                    return function (e) {
+                        if (infoWindow.getMap()) {
+                            infoWindow.close()
+                        }else{
+                            infoWindow.open(map, marker);
+                        }
+                    };
+                }
+                function makeMark(address, gymName, dayPrice, gymID, index) {
+                    naver.maps.Service.fromAddrToCoord({
+                        address: address
+                    }, function (status,response) {
+                        if (status === naver.maps.Service.Status.ERROR) {
+                            return alert('Something wrong!');
+                        }
+
+                        var x = response.result.items[0].point.x;
+                        var y = response.result.items[0].point.y;
+
+                        var marker = new naver.maps.Marker({
+                            position: new naver.maps.LatLng(parseFloat(y), parseFloat(x)),
+                            map: map,
+                            icon: {
+                                content: [
+                                    '<div class="badge rounded-pill bg-secondary" style="font-size: 13px;">' + gymName + '</div>'
+                                ].join('')
+                            }
+                        });
+
+                        var infoWindow=new naver.maps.InfoWindow({
+                            content:['<div class="card"><a href="/viewGym?gymID='+gymID+'"><svg class="bd-placeholder-img card-img-top" width="100%" height="180" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Placeholder: Image cap" preserveAspectRatio="xMidYMid slice" focusable="false"><rect width="100%" height="100%" fill="#868e96"/><text x="50%" y="50%" fill="#dee2e6" dy=".3em">'+'업체 사진'
+                                +'</text></svg></a>'+'<div class="card-body"><h5 class="card-title">'+gymName+'</h5>'
+                                +'<p class="card-text">'+'일일권 : '+dayPrice+'원'+'</p><p class="card-text">'+'주소: '+response.v2.addresses[0].roadAddress+'</p></div>'].join('')
+                        });
+
+                        markers.push(marker);
+                        infoWindows.push(infoWindow);
+                        naver.maps.Event.addListener(marker,'click',function (e){
+                            if (infoWindow.getMap()) {
+                                infoWindow.close()
+                            } else{
+                                infoWindow.open(map, marker);
+                            }
+                        });
+
+                        if (index == gymList.length-1) {
+                            var markerClustering = new MarkerClustering({
+                                minClusterSize: 2,
+                                maxZoom: 8,
+                                map: map,
+                                markers: markers,
+                                disableClickZoom: false,
+                                gridSize: 120,
+                                icons: [htmlMarker1, htmlMarker2, htmlMarker3, htmlMarker4, htmlMarker5],
+                                indexGenerator: [10, 100, 200, 500, 1000],
+                                stylingFunction: function(clusterMarker, count) {
+                                    $(clusterMarker.getElement()).find('div:first-child').text(count);
+                                }
+                            });
+                        }
+                    });
+                }
+
+                $('#address').on('keydown', function(e) {
+                    var keyCode = e.which;
+
+                    if (keyCode === 13) { // Enter Key
+                        searchAddressToCoordinate($('#address').val());
+                    }
+                });
+
+                $('#submit').on('click', function(e) {
+                    e.preventDefault();
+
+                    searchAddressToCoordinate($('#address').val());
+                });
+            }
+
+        </script>
+
+        <div class="p-3 text-center bg-body-tertiary">
+            <a class="btn btn-lg btn-outline-secondary" th:if="${session.loginCheck==null}" href="/login">헬스장 등록하기</a>
+            <a class="btn btn-lg btn-outline-secondary" th:unless="${session.loginCheck==null}" href="/loadGym">헬스장 등록하기</a>
+        </div>
+
+    </div>
+
+
+</body>
+
+</html>

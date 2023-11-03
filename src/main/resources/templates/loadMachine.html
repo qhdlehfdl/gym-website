@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="https://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" href="css/bootstrap.min.css">
+    <link rel="stylesheet" href="css/custom.css?after">
+<!--    ?after -> css파일 인식못할때-->
+    <script src="https://code.jquery.com/jquery-3.1.1.min.js"></script>
+    <script src="js/bootstrap.js"></script>
+    <title>상품 등록</title>
+    <style type="text/css">
+        html,
+        body {
+            height: 100%;
+        }
+
+        .form-signin {
+            max-width: 450px;
+            padding: 1rem;
+        }
+    </style>
+</head>
+
+<body>
+<div class="container" style="max-width: 650px;">
+    <main>
+        <div class="py-5 text-center">
+            <h2>상품 등록</h2>
+        </div>
+        <div class="row">
+            <div class="text-center">
+                <form method="post" enctype="multipart/form-data" action="/loadMachineAction">
+                    <div class="row mb-3 text-center">
+                        <div class="form-label">타겟 부위</div>
+                        <div class="col-2"><input type="radio" id="back" name="part" value="0" required><label for="back">등</label></div>
+                        <div class="col-2"><input type="radio" id="chest" name="part" value="1" ><label for="chest">가슴</label></div>
+                        <div class="col-2"><input type="radio" id="shoulder" name="part" value="2" ><label for="shoulder">어깨</label></div>
+                        <div class="col-2"><input type="radio" id="leg" name="part" value="3" ><label for="leg">하체</label></div>
+                        <div class="col-2"><input type="radio" id="arm" name="part" value="4" ><label for="arm">팔</label></div>
+                        <div class="col-2"><input type="radio" id="others1" name="part" value="5" ><label for="others1">기타</label></div>
+                    </div>
+
+                    <div class="row mb-3 text-center">
+                        <div class="form-label">브랜드</div>
+                        <div class="col-2"><input type="radio" id="newtech" name="brand" value="newtech" required><label for="newtech">뉴텍</label></div>
+                        <div class="col-2"><input type="radio" id="hammerstrength" name="brand" value="hammerstrength" ><label for="hammerstrength">해머스트렝스</label></div>
+                        <div class="col-2"><input type="radio" id="nautilus" name="brand" value="nautilus" ><label for="nautilus">너틸러스</label></div>
+                        <div class="col-2"><input type="radio" id="cybex" name="brand" value="cybex" ><label for="cybex">싸이벡스</label></div>
+                        <div class="col-2"><input type="radio" id="others2" name="brand" value="others" ><label for="others2">기타</label></div>
+                    </div>
+
+                    <div class="row g-3 py-3">
+                        <div class="col-12">
+                            <label for="price" class="form-label">가격</label>
+                            <input class="form-control" id="price" name="price" required>
+                        </div>
+                    </div>
+
+                    <div class="row g-3 py-3">
+                        <div class="col-12">
+                            <label for="file" class="form-label">사진파일</label>
+                            <input type="file" class="form-control" id="file" name="file" required>
+                        </div>
+                    </div>
+
+                    <div class="row g-3 py-3">
+                        <div class="col-12">
+                            <label for="title" class="form-label">제목</label>
+                            <input type="text" class="form-control" id="title" name="title" maxlength="45" required>
+                        </div>
+                    </div>
+
+                    <div class="row g-3 py-3">
+                        <div class="col-12">
+                            <label for="content" class="form-label">상품설명</label>
+                            <textarea id="content" name="content" class="form-control" rows="10" required></textarea>
+                        </div>
+                    </div>
+
+                    <hr class="my-4">
+
+                    <button class="w-100 btn btn-outline-secondary btn-lg" type="submit">상품 등록하기</button>
+                </form>
+            </div>
+        </div>
+    </main>
+</div>
+</body>
+
+</html>

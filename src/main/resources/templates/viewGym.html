@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="https://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" href="../css/bootstrap.min.css">
+    <link rel="stylesheet" href="css/custom.css?after">
+    <!--    ?after -> css파일 인식못할때-->
+    <script src="https://code.jquery.com/jquery-3.1.1.min.js"></script>
+    <script src="js/bootstrap.js"></script>
+    <title>헬스장 메인</title>
+</head>
+
+<body>
+    <div class="container">
+        <header class="border-bottom 1h-1 py-3">
+            <div class="row flex-nowrap justify-content-between align-items-center">
+                <div class="col-4 pt-1  align-content-center">
+                    <a class="blog-header-logo text-body-emphasis text-decoration-none" href="/main">헬스</a>
+                </div>
+                <div class="col-4 pt-1 text-center">
+                    <h3 class="text-body-emphasis" th:if="${session.loginCheck==null}" th:text="'환영합니다!'"></h3>
+                    <h3 class="text-body-emphasis" th:unless="${session.loginCheck==null}" th:text="${session.loginCheck+'님 환영합니다!'}"></h3>
+                </div>
+                <div class="col-4 d-flex justify-content-end align-items-center">
+                    <a class="btn btn-sm btn-outline-secondary" href="/login" th:if="${session.loginCheck==null}">장바구니</a>
+                    <a class="btn btn-sm btn-outline-secondary" href="/cart" th:unless="${session.loginCheck==null}">장바구니</a>
+                    <a class="btn btn-sm btn-outline-secondary" th:if="${session.loginCheck==null}" href="/login">로그인</a>
+                    <a class="btn btn-sm btn-outline-secondary" th:unless="${session.loginCheck==null}" href="/logout">로그아웃</a>
+                </div>
+            </div>
+        </header>
+
+        <div class="nav-scroller py-1 mb-3 border-bottom">
+            <nav class="nav nav-underline justify-content-between">
+                <a class="nav-item nav-link link-body-emphasis" href="/machineList">머신</a>
+                <a class="nav-item nav-link link-body-emphasis" href="/search">헬스장 찾기</a>
+            </nav>
+        </div>
+
+        <div class="py-3 text-center">
+            <h2 th:text="${gym.gymName}"></h2>
+        </div>
+
+        <div class="bg-body-tertiary text-center">
+            <svg class="bd-placeholder-img card-img-top" width="100%" height="540" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Placeholder: Image cap" preserveAspectRatio="xMidYMid slice" focusable="false"><rect width="100%" height="100%" fill="#868e96"/><text x="50%" y="50%" fill="#dee2e6" dy=".3em">업체 사진</text></svg>
+            <h5 class="py-5">일일권 : [[${gym.dayPrice}]]원</h5>
+        </div>
+    </div>
+
+
+</body>
+
+</html>

@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="https://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" href="../css/bootstrap.min.css">
+    <link rel="stylesheet" href="css/custom.css?after">
+    <!--    ?after -> css파일 인식못할때-->
+    <script src="https://code.jquery.com/jquery-3.1.1.min.js"></script>
+    <script src="js/bootstrap.js"></script>
+    <title>헬스장 메인</title>
+    <script th:inline="javascript">
+        function putInCart(userID, machineID){
+            $.ajax({
+                type:'POST',
+                url:'/putInCart',
+                data:{userID:userID, machineID:parseInt(machineID)},
+                success:function (result){
+                    if(result==true){
+                        //장바구니 추가
+                        $('#'+machineID).attr('class', 'btn btn-lg btn-secondary');
+                        $('button > label').text(parseInt($('button > label').text()) + 1);
+                    }
+                    else {
+                        //이미 있음
+                        $('#'+machineID).attr('class','btn btn-outline-secondary btn-lg');
+                        $('button > label').text(parseInt($('button > label').text()) - 1);
+                    }
+                }
+            })
+        }
+    </script>
+</head>
+
+<body>
+    <div class="container">
+        <header class="border-bottom 1h-1 py-3">
+            <div class="row flex-nowrap justify-content-between align-items-center">
+                <div class="col-4 pt-1  align-content-center">
+                    <a class="blog-header-logo text-body-emphasis text-decoration-none" href="/main">헬스</a>
+                </div>
+                <div class="col-4 pt-1 text-center">
+                    <h3 class="text-body-emphasis" th:if="${session.loginCheck==null}" th:text="'환영합니다!'"></h3>
+                    <h3 class="text-body-emphasis" th:unless="${session.loginCheck==null}" th:text="${session.loginCheck+'님 환영합니다!'}"></h3>
+                </div>
+                <div class="col-4 d-flex justify-content-end align-items-center">
+                    <a class="btn btn-sm btn-outline-secondary" href="/login" th:if="${session.loginCheck==null}">장바구니</a>
+                    <a class="btn btn-sm btn-outline-secondary" href="/cart" th:unless="${session.loginCheck==null}">장바구니</a>
+                    <a class="btn btn-sm btn-outline-secondary" th:if="${session.loginCheck==null}" href="/login">로그인</a>
+                    <a class="btn btn-sm btn-outline-secondary" th:unless="${session.loginCheck==null}" href="/logout">로그아웃</a>
+                </div>
+            </div>
+        </header>
+
+        <div class="nav-scroller py-1 mb-3 border-bottom">
+            <nav class="nav nav-underline justify-content-between">
+                <a class="nav-item nav-link link-body-emphasis" href="/machineList">머신</a>
+                <a class="nav-item nav-link link-body-emphasis" href="/search">헬스장 찾기</a>
+            </nav>
+        </div>
+
+        <div class="py-3 text-center">
+            <h2 th:text="${machine.title}"></h2>
+        </div>
+
+        <div class="bg-body-tertiary text-center">
+            <img class="my-5" th:src="${machine.filePath}" width="600px" height="400px">
+
+            <div class="d-flex gap-2 justify-content-center my-3">
+                <span class="badge text-bg-secondary rounded-pill" th:if="${machine.part==0}" th:text="등">></span>
+                <span class="badge text-bg-secondary rounded-pill" th:if="${machine.part==1}" th:text="가슴"></span>
+                <span class="badge text-bg-secondary rounded-pill" th:if="${machine.part==2}" th:text="어깨"></span>
+                <span class="badge text-bg-secondary rounded-pill" th:if="${machine.part==3}" th:text="하체"></span>
+                <span class="badge text-bg-secondary rounded-pill" th:if="${machine.part==4}" th:text="팔"></span>
+                <span class="badge text-bg-secondary rounded-pill" th:if="${machine.part==5}" th:text="기타"></span>
+
+                <span class="badge text-bg-secondary rounded-pill" th:if="${machine.brand=='newtech'}" th:text="뉴텍">></span>
+                <span class="badge text-bg-secondary rounded-pill" th:if="${machine.brand=='hammerstrength'}" th:text="해머스트렝스"></span>
+                <span class="badge text-bg-secondary rounded-pill" th:if="${machine.brand=='nautilus'}" th:text="너틸러스"></span>
+                <span class="badge text-bg-secondary rounded-pill" th:if="${machine.brand=='cybex'}" th:text="싸이벡스"></span>
+                <span class="badge text-bg-secondary rounded-pill" th:if="${machine.brand=='others'}" th:text="기타"></span>
+
+                <span class="badge text-bg-secondary rounded-pill" th:text="${machine.price}+'원'"></span>
+            </div>
+
+            <div class="py-5">
+                <p th:text="${machine.content}"></p>
+                <th:block th:if="${session.loginCheck!=null}">
+                    <button th:id="${machine.id}" th:if="${#lists.contains(cartList,machine.id)}" class="btn btn-lg btn-secondary" th:onclick="putInCart([[${session.loginCheck}]],[[${machine.id}]]);">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="30" height="35" fill="currentColor" class="bi bi-cart2" viewBox="0 0 16 16">
+                            <path d="M0 2.5A.5.5 0 0 1 .5 2H2a.5.5 0 0 1 .485.379L2.89 4H14.5a.5.5 0 0 1 .485.621l-1.5 6A.5.5 0 0 1 13 11H4a.5.5 0 0 1-.485-.379L1.61 3H.5a.5.5 0 0 1-.5-.5zM3.14 5l1.25 5h8.22l1.25-5H3.14zM5 13a1 1 0 1 0 0 2 1 1 0 0 0 0-2zm-2 1a2 2 0 1 1 4 0 2 2 0 0 1-4 0zm9-1a1 1 0 1 0 0 2 1 1 0 0 0 0-2zm-2 1a2 2 0 1 1 4 0 2 2 0 0 1-4 0z"/>
+                        </svg>
+                        <label th:text="${cartCount}"></label>
+                    </button>
+                    <button th:id="${machine.id}" th:unless="${#lists.contains(cartList,machine.id)}" class="btn btn-lg btn-outline-secondary" th:onclick="putInCart([[${session.loginCheck}]],[[${machine.id}]]);">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="30" height="35" fill="currentColor" class="bi bi-cart2" viewBox="0 0 16 16">
+                            <path d="M0 2.5A.5.5 0 0 1 .5 2H2a.5.5 0 0 1 .485.379L2.89 4H14.5a.5.5 0 0 1 .485.621l-1.5 6A.5.5 0 0 1 13 11H4a.5.5 0 0 1-.485-.379L1.61 3H.5a.5.5 0 0 1-.5-.5zM3.14 5l1.25 5h8.22l1.25-5H3.14zM5 13a1 1 0 1 0 0 2 1 1 0 0 0 0-2zm-2 1a2 2 0 1 1 4 0 2 2 0 0 1-4 0zm9-1a1 1 0 1 0 0 2 1 1 0 0 0 0-2zm-2 1a2 2 0 1 1 4 0 2 2 0 0 1-4 0z"/>
+                        </svg>
+                        <label th:text="${cartCount}"></label>
+                    </button>
+                </th:block>
+                <th:block th:unless="${session.loginCheck!=null}">
+                    <button type="button" class="btn btn-outline-secondary btn-lg" onclick="location.href='/login'">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="30" height="35" fill="currentColor" class="bi bi-cart2" viewBox="0 0 16 16">
+                            <path d="M0 2.5A.5.5 0 0 1 .5 2H2a.5.5 0 0 1 .485.379L2.89 4H14.5a.5.5 0 0 1 .485.621l-1.5 6A.5.5 0 0 1 13 11H4a.5.5 0 0 1-.485-.379L1.61 3H.5a.5.5 0 0 1-.5-.5zM3.14 5l1.25 5h8.22l1.25-5H3.14zM5 13a1 1 0 1 0 0 2 1 1 0 0 0 0-2zm-2 1a2 2 0 1 1 4 0 2 2 0 0 1-4 0zm9-1a1 1 0 1 0 0 2 1 1 0 0 0 0-2zm-2 1a2 2 0 1 1 4 0 2 2 0 0 1-4 0z"/>
+                        </svg>
+                        <label th:text="${cartCount}"></label>
+                    </button>
+                </th:block>
+            </div>
+        </div>
+
+    </div>
+
+
+</body>
+
+</html>
